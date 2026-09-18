@@ -13,6 +13,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - JavaScript parser foundation
+- Added JavaScript ES modules with JSDoc contracts for extracted pages,
+  normalized transactions, account context, source locations, and results.
+  Use JavaScript initially; migrate to TypeScript later while retaining the
+  architecture and regression tests. Migration is planned, not completed.
+- Added local PDF.js extraction with separate missing/incorrect-password errors,
+  positioned text, page progress, and resource cleanup. Textless scans report
+  unsupported OCR rather than returning an empty success.
+- Added one explicitly selected Union Bank parser for the available five-column
+  "Details of Statement" layout. Union is the first bank because an actual
+  statement is available, replacing SBI as the initial candidate. Support wrapped
+  narration within pages, repeated headers, explicit debit/credit markers, signed
+  balances, and row/layout issues; do not guess transaction direction.
+- Added integer-paise normalization, calendar-date validation, account/model
+  checks, and running-balance reconciliation. Processing reports success,
+  partial success, or failure and excludes invalid transactions.
+- Added a processing service, cancellable worker boundary, and a small Vite
+  browser harness for local-file processing and JSON inspection. Bundle the
+  PDF.js worker locally; keep parsing independent of the interface.
+- Added fictional fixtures and local regression tests, plus an opt-in actual-PDF
+  comparison that keeps private statement data and passwords outside Git.
+- Added architecture and runtime walkthrough documents covering PDF.js calls,
+  module execution, tests, and temporary inspection files versus browser runtime.
+
+### Changed - Private statement handling
+- Ignore PDFs, local statement folders, and temporary inspection/output files.
+  Vite also denies access to private PDFs and folders: Git ignore rules alone
+  do not control HTTP access.
+- Verified one supplied password-protected, two-page Union statement against
+  independent expected data: all 28 transactions matched with no validation
+  issues. More real variations and browser interaction verification are still
+  required before claiming broad support.
+
 ### Changed - PatBook v2 revamp
 - Cleared the legacy application, designs, debug scripts, parser tests, and
   automation from the v2 working baseline. The existing implementation remains
@@ -29,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in the application does not establish reliable support for every statement
   variation; parser correctness requires verification against real statements.
 - The existing React + FastAPI implementation is preserved on `legacy/v1`
-  as a reference. The PatBook v2 pipeline has not been implemented yet.
+  as a reference. The v2 Union parser foundation is now implemented; broader
+  statement coverage and browser interaction verification remain pending.
 - `main` is now the GitHub default branch for the PatBook v2 revamp.
   `legacy/v1` preserves the existing implementation; `develop` is retained
   temporarily while external references are checked. Restart feature branches

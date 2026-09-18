@@ -1,0 +1,16 @@
+{
+  "name": "patbook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PatBook v2 local statement processing foundation",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": { "pdfjs-dist": "6.3.289" },
+  "devDependencies": { "vite": "8.3.0" }
+}

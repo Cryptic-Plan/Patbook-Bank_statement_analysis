@@ -20,3 +20,9 @@ backend/.env
 node_modules/
 dist/
 build/
+
+# Private statements and processing output
+/test-learn-statements/
+*.pdf
+/tmp/
+/output/
