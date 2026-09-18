@@ -13,16 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed - PatBook v2 revamp
+- Cleared the legacy application, designs, debug scripts, parser tests, and
+  automation from the v2 working baseline. The existing implementation remains
+  preserved on `legacy/v1` with its Git history.
+- Retained README.md, CHANGELOG.md, LICENSE, and .gitignore as the minimal baseline.
+- Replaced the README with the PatBook v2 development plan. No new parser or
+  application implementation is included yet.
+- Use PatBook v2 / v2 revamp as the restart name; client-side processing describes
+  its architecture. The cleanup branch is `chore/v2-revamp`, targeting `main`.
+
 ### Project status - 2026-09-18
-- All eight existing bank parsers (HDFC, Canara, Union Bank, Federal Bank, SBI,
+- All eight legacy bank parsers (HDFC, Canara, Union Bank, Federal Bank, SBI,
   Kotak, PNB, and Kerala Gramin Bank) are still under development. Their presence
   in the application does not establish reliable support for every statement
   variation; parser correctness requires verification against real statements.
-- The existing React + FastAPI implementation is the legacy baseline for the
-  restart and remains available as a reference. The client-first pipeline has
-  not been implemented yet.
+- The existing React + FastAPI implementation is preserved on `legacy/v1`
+  as a reference. The PatBook v2 pipeline has not been implemented yet.
+- `main` is now the GitHub default branch for the PatBook v2 revamp.
+  `legacy/v1` preserves the existing implementation; `develop` is retained
+  temporarily while external references are checked. Restart feature branches
+  will target `main`.
 
-### Planned restart - decisions recorded 2026-09-18
+### Planned PatBook v2 revamp - decisions recorded 2026-09-18
 - Build a local-first financial analysis system with PDF processing on the
   user's device, preserving the existing implementation.
 - Begin with one bank and one actual statement. SBI is the initial candidate;
@@ -38,9 +51,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Defer automatic bank detection, multiple-statement merging, multiple-bank
   support, account analytics, demo mode, internal-transfer detection, and other
   product features until the first parser pipeline is verified.
-- Proposed branch arrangement: retain `develop` for legacy work, preserve a
-  `legacy/v1` baseline, integrate restart work into `next/client-first`, and
-  begin on `feat/parser-foundation`. These branches have not been created yet.
+- Defer CI/CD and hosting automation during early development. Run relevant
+  tests and checks locally; parser regression tests remain part of the plan.
+
+### Removed
+- Legacy GitHub Actions CI (`.github/workflows/ci.yml`) and scheduled Render
+  keepalive pings (`.github/workflows/ping.yml`) from the restart branch.
+- Legacy Render deployment blueprint (`render.yaml`). This file removal does
+  not disable services or deployment integrations already configured externally.
+
+The earlier entries below record legacy development; they do not imply that
+removed automation remains enabled for the restart.
 
 ### Added
 - **PNB (Punjab National Bank) parser** - New parser with support for:
