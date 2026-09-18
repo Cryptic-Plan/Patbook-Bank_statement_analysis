@@ -2,10 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+Update this file with every major architecture change, feature, parser behavior
+change, breaking change, or significant fix. Record what changed and why under
+`Unreleased`; routine formatting and minor refactoring do not need entries.
+Keep planned work separate from completed changes, and move completed entries
+into a dated version section when releasing.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Project status - 2026-09-18
+- All eight existing bank parsers (HDFC, Canara, Union Bank, Federal Bank, SBI,
+  Kotak, PNB, and Kerala Gramin Bank) are still under development. Their presence
+  in the application does not establish reliable support for every statement
+  variation; parser correctness requires verification against real statements.
+- The existing React + FastAPI implementation is the legacy baseline for the
+  restart and remains available as a reference. The client-first pipeline has
+  not been implemented yet.
+
+### Planned restart - decisions recorded 2026-09-18
+- Build a local-first financial analysis system with PDF processing on the
+  user's device, preserving the existing implementation.
+- Begin with one bank and one actual statement. SBI is the initial candidate;
+  confirm the choice using available statements rather than assuming the
+  existing parser is reliable. Add statement variations and regression tests
+  before expanding to another bank.
+- Separate PDF extraction, bank-specific parsing, normalized domain data,
+  validation, and processing services. React will consume service results
+  rather than parse bank statements directly.
+- Start with explicit bank selection and normalized transaction JSON. Report
+  successful, partial, and failed processing with issues for rows requiring
+  review; do not silently discard ambiguous rows.
+- Defer automatic bank detection, multiple-statement merging, multiple-bank
+  support, account analytics, demo mode, internal-transfer detection, and other
+  product features until the first parser pipeline is verified.
+- Proposed branch arrangement: retain `develop` for legacy work, preserve a
+  `legacy/v1` baseline, integrate restart work into `next/client-first`, and
+  begin on `feat/parser-foundation`. These branches have not been created yet.
 
 ### Added
 - **PNB (Punjab National Bank) parser** - New parser with support for:
