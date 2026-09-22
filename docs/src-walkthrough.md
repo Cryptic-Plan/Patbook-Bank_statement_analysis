@@ -1,6 +1,6 @@
 **`src/` contains the processing engine.** It reads a local PDF, converts its contents into transactions, validates them, and returns data to the interface.
 
-There are nine files:
+There are eleven files:
 
 ```text
 src/
@@ -11,9 +11,11 @@ src/
 │   ├── pdf.js
 │   └── lines.js
 ├── parsers/
-│   ├── union/
+│   ├── canara/
 │   │   └── parser.js
-│   └── kotak/
+│   ├── kotak/
+│   │   └── parser.js
+│   └── union/
 │       └── parser.js
 ├── validation/
 │   └── transactions.js
@@ -155,7 +157,7 @@ the parser is selected by the bank chosen in the interface:
 ```js
 const processStatement = createStatementProcessor({
   extractPdf,
-  parser // unionParser or kotakParser, by bankId
+  parser // unionParser, kotakParser, or canaraParser, by bankId
 });
 ```
 
@@ -449,6 +451,22 @@ When flushing, it:
 If a row cannot be interpreted, it creates an `invalid_row` issue instead of guessing.
 
 Its output contains candidate transactions, parsing issues, and the number of recognized candidate rows. Validation happens afterward.
+
+**6a. [parsers/kotak/parser.js](<../src/parsers/kotak/parser.js>) and [parsers/canara/parser.js](<../src/parsers/canara/parser.js>) follow the same pattern with template-specific rules.**
+
+The Kotak parser reads seven columns and takes direction from the dedicated
+Withdrawal/Deposit columns. The Canara parser reads five columns
+(Date, Particulars, Deposits, Withdrawals, Balance) and takes direction from
+the Deposits/Withdrawals columns.
+
+Canara's e-Passbook template wraps narration the other way round: the
+particulars print **above** the dated anchor line, continuation lines such as
+the transaction id and time print below it, and a `Chq:` reference line closes
+every block. The parser therefore accumulates narration before the anchor,
+keeps following lines that sit within about 12pt of the previous line (a block
+separator is about 24pt), and reads the Chq marker as the reference. Opening
+Balance and Closing Balance rows are captured and reconciled against the first
+and last transactions.
 
 ---
 

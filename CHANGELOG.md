@@ -13,6 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Canara Bank e-Passbook parser - 2026-09-22
+- Added a Canara Bank parser for the verified five-column "e-Passbook" layout
+  (Date, Particulars, Deposits, Withdrawals, Balance). Transaction direction
+  comes from the dedicated Deposits/Withdrawals columns, never from narration.
+- Added block reconstruction for the template's inverted wrapping: narration
+  wraps above the dated anchor line, continuation lines follow below it, and a
+  Chq reference line closes each block. Blocks without a Chq line close through
+  line spacing (~12pt within a block, ~24pt between blocks). Empty Chq markers
+  leave the reference unset instead of failing the row.
+- Added closing-balance reconciliation alongside the existing opening-balance
+  check: the statement's Opening Balance row is checked against the first
+  transaction and the Closing Balance row against the last, reporting a
+  `balance_mismatch` warning on divergence.
+- Added Canara Bank to the browser harness bank dropdown. The worker selects
+  the parser by the chosen bank. SBI and Kerala Gramin Bank remain listed for
+  testing until parsers exist and are disabled with a clear message.
+- Verified the parser against one real fifteen-page e-Passbook statement: all
+  98 candidate rows accepted, zero rejected, with the running balance chain
+  reconciling independently and opening/closing balances matching. The
+  statement's one out-of-order reversal entry (dated between the rows around
+  it) is reported as a `date_order` warning for review, not reordered.
+- Added fictional Canara fixtures and regression tests covering column
+  reconstruction from positions, narration wrapping above and below the anchor,
+  line-spacing block closure, repeated headers, multipage, opening and closing
+  reconciliation, malformed rows, bank evidence outside narration, shifted
+  layouts, summary pages, width scaling, footer-region rows, and unassigned
+  table text.
+
 ### Added - Bank selection and Kotak Mahindra parser - 2026-09-22
 - Added a Kotak Mahindra Bank savings-account parser for the verified
   seven-column "Savings Account Transactions" layout. Transaction direction comes
@@ -83,12 +111,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its architecture. The cleanup branch is `chore/v2-revamp`, targeting `main`.
 
 ### Project status - 2026-09-22
-- Union Bank (five-column "Details of Statement") and Kotak Mahindra Bank
-  (seven-column "Savings Account Transactions") parsers are implemented and each
-  verified against one real statement. SBI and Kerala Gramin Bank are listed in
-  the interface for testing but have no parsers yet. Parser correctness requires
-  verification against more real statement variations before claiming broad
-  support.
+- Union Bank (five-column "Details of Statement"), Kotak Mahindra Bank
+  (seven-column "Savings Account Transactions"), and Canara Bank (five-column
+  "e-Passbook") parsers are implemented and each verified against one real
+  statement. SBI and Kerala Gramin Bank are listed in the interface for testing
+  but have no parsers yet. Parser correctness requires verification against
+  more real statement variations before claiming broad support.
 - Automatic bank detection, multiple-statement merging, account analytics, demo
   mode, and internal-transfer detection remain deferred.
 

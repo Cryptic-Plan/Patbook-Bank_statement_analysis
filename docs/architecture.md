@@ -8,8 +8,8 @@
 - Start with Union Bank because an actual password-protected statement is
   available. The first supported format is the five-column "Details of
   Statement" layout: Date, Transaction Id, Remarks, Amount, Balance.
-- Bank selection is explicit. Union checks statement evidence and the expected
-  layout; there is no automatic parser registry yet.
+- Bank selection is explicit. Union, Kotak Mahindra, and Canara check statement
+  evidence and the expected layout; there is no automatic parser registry yet.
 - Process local PDF bytes using bundled PDF.js. Documents and passwords are not
   sent to a backend, bank API, or CDN. No persistence or telemetry is implemented.
 - Separate interface, extraction, bank parsing, domain, validation, and services.
@@ -72,15 +72,16 @@ Process one statement at a time. Cancellation terminates its worker. Passwords
 are cleared from the form after submission and excluded from output and storage.
 JavaScript cannot guarantee immediate secure erasure of a password string.
 
-Union uses template-specific column boundaries and a footer region. Changed
-headers, unassigned text, and dated rows outside that region produce issues.
-Narration wrapping is supported within a page; transactions split across pages
-require review. Scans need OCR, which is not implemented. Reverse date order is
-flagged instead of silently reordered.
+Union, Kotak Mahindra, and Canara use template-specific column boundaries and
+footer regions. Changed headers, unassigned text, and dated rows outside those
+regions produce issues. Narration wrapping is supported within a page;
+transactions split across pages require review. Scans need OCR, which is not
+implemented. Reverse date order is flagged instead of silently reordered.
 
-One real statement has been verified. Synthetic fixtures exercise other cases,
-but more independently checked real Union layouts are required before broad
-support can be claimed. Browser interactions still require manual verification.
+One real statement per implemented bank has been verified. Synthetic fixtures
+exercise other cases, but more independently checked real layouts are required
+before broad support can be claimed. Browser interactions still require manual
+verification.
 
 ## Later work
 

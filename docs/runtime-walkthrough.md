@@ -19,7 +19,7 @@ src/workers/statement.worker.js
                       ↓
 src/services/process-statement.js
      ├─ src/extraction/pdf.js → PDF.js → positioned text
-     ├─ src/parsers/{union,kotak}/parser.js → normalized candidates
+     ├─ src/parsers/{union,kotak,canara}/parser.js → normalized candidates
      └─ src/validation/transactions.js → accepted transactions + issues
                       ↓ worker message
 browser/main.js → summary + JSON rendered as plain text
@@ -109,6 +109,19 @@ uses exact integer arithmetic and checks safe range. `parseBankDate()` checks
 calendar validity. The parser adds account context and source coordinates.
 Invalid rows become review issues rather than guessed transactions.
 
+## 5a. Canara reconstructs blocks that wrap around the dated line
+
+The Canara e-Passbook template prints narration above each dated anchor line,
+continuation lines (transaction id, value date, time) below it, and a `Chq:`
+reference line at the end of every block. [canaraParser.parse()](../src/parsers/canara/parser.js)
+keeps narration seen before the anchor, attaches following lines while the
+vertical gap stays within about 12pt (blocks are about 24pt apart), and reads
+the Chq marker as the optional reference. Direction comes from the dedicated
+Deposits/Withdrawals columns. Opening Balance and Closing Balance rows
+reconcile against the first and last transactions. The statement's own row
+order is preserved: an out-of-order reversal entry is flagged as a `date_order`
+warning by validation instead of being reordered.
+
 ## 6. Validate and return to the interface
 
 [validateTransactions()](../src/validation/transactions.js) enforces the JSDoc
@@ -152,14 +165,16 @@ application processing remains browser-side.
 | --- | --- |
 | `normalization.test.js` | Paise conversion, malformed values, calendar dates |
 | `union-parser.test.js` | Fictional positioned data, wrapping, headers, layout and row errors |
+| `kotak-parser.test.js` | Seven-column rows, wrapping, repeated headers, multipage, opening-balance reconciliation |
+| `canara-parser.test.js` | Five-column blocks wrapping around the dated anchor, line-spacing closure, opening/closing reconciliation |
 | `validation.test.js` | Account/model checks, duplicates, balances, date order |
 | `processing.test.js` | Service coordination, statuses, issues and row counts |
 | `extraction.test.js` | PDF wrapper with a controlled library replacement; errors and cleanup |
 | `browser-processing.test.js` | Controller unit tests using a fake Worker |
 | `private-statement.test.js` | Actual PDF.js and comparison to independent private expected data |
 
-`tests/fixtures/union/documents.js` contains fictional data, not real statement
-contents. The private test skips unless `PATBOOK_TEST_PDF` and
+`tests/fixtures/{union,kotak,canara}/documents.js` contain fictional data, not
+real statement contents. The private test skips unless `PATBOOK_TEST_PDF` and
 `PATBOOK_TEST_EXPECTED` environment variables provide paths. Use
 `PATBOOK_TEST_PASSWORD` for a protected PDF; never commit an actual password.
 

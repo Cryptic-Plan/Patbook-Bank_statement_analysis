@@ -15,12 +15,13 @@ let controller;
 const banks = {
   union: 'Union Bank',
   kotak: 'Kotak Mahindra Bank',
+  canara: 'Canara Bank',
   sbi: 'State Bank of India',
   kgb: 'Kerala Gramin Bank',
 };
 // The worker injects parsers for these banks; other banks stay selectable for
 // testing until their parsers exist.
-const supportedBanks = new Set(['union', 'kotak']);
+const supportedBanks = new Set(['union', 'kotak', 'canara']);
 
 // Event registration happens at module load; processing begins only on submit.
 form.addEventListener('submit', async event => {
@@ -73,7 +74,7 @@ function updateBankAvailability() {
   processButton.disabled = !supported;
   status.textContent = supported
     ? 'Choose a PDF to begin.'
-    : `${banks[bankSelect.value]} parsing is not available yet. Select Union Bank.`;
+    : `${banks[bankSelect.value]} parsing is not available yet. Select a supported bank.`;
 }
 
 function setBusy(busy) {

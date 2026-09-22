@@ -3,6 +3,7 @@ import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { createPdfExtractor } from '../extraction/pdf.js';
 import { unionParser } from '../parsers/union/parser.js';
 import { kotakParser } from '../parsers/kotak/parser.js';
+import { canaraParser } from '../parsers/canara/parser.js';
 import { createStatementProcessor } from '../services/process-statement.js';
 
 // Vite bundles this library asset locally. No external CDN receives PDF bytes.
@@ -23,7 +24,7 @@ self.onmessage = async ({ data }) => {
   let password = data.password;
   delete data.password;
   // Explicit parser selection by the bank chosen in the interface.
-  const parser = { union: unionParser, kotak: kotakParser }[data.account?.bankId];
+  const parser = { union: unionParser, kotak: kotakParser, canara: canaraParser }[data.account?.bankId];
   try {
     if (!parser) {
       self.postMessage({ kind: 'result', result: noParserResult });
