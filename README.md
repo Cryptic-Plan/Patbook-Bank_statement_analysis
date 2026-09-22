@@ -5,9 +5,9 @@ A local-first financial analysis project under development.
 ## Development status
 
 The v2 revamp has a JavaScript parser foundation and a small browser test page.
-PDF extraction, Union Bank parsing, normalization, and validation run locally;
-the output is normalized JSON. This is an early implementation, not verified
-support for every Union Bank statement format.
+PDF extraction, Union Bank and Kotak Mahindra Bank parsing, normalization, and
+validation run locally; the output is normalized JSON. This is an early
+implementation, not verified support for every statement format of either bank.
 
 The previous React + FastAPI application is preserved on `legacy/v1`.
 Its eight bank parsers remain unfinished; they are reference implementations,
@@ -21,11 +21,14 @@ Process one actual bank statement on the user's device:
 PDF → extraction → bank-specific parser → normalized transactions → validation → JSON
 ```
 
-Start with Union Bank and explicit selection, using the actual statement
-available for development. The initial format has Date, Transaction Id, Remarks,
-Amount, and Balance columns. One protected, two-page statement was checked against
-independently extracted expected data: all 28 transactions matched. Verify more
-real variations before adding banks or connecting a React transaction interface.
+Start with explicit bank selection and normalized transaction JSON. Two formats
+are implemented and each verified against one real statement: the Union Bank
+"Details of Statement" layout (Date, Transaction Id, Remarks, Amount, Balance;
+28 transactions matched independently extracted expected data) and the Kotak
+Mahindra Bank "Savings Account Transactions" layout (seven columns with dedicated
+Withdrawal/Deposit columns and Opening Balance reconciliation; 32 transactions
+accepted with full balance reconciliation). Verify more real variations before
+adding banks or connecting a React transaction interface.
 
 ## Run locally
 
@@ -36,9 +39,11 @@ rtk proxy npm ci
 rtk proxy npm run dev
 ```
 
-Open the local URL printed by Vite. Select a Union PDF from your device, provide a
-local account label, and enter the PDF password if needed. Passwords are not saved
-or included in results. The page shows accepted/rejected counts, review issues,
+Open the local URL printed by Vite. Select the bank, choose a PDF from your
+device, provide a local account label, and enter the PDF password if needed.
+Passwords are not saved or included in results. Union Bank and Kotak Mahindra
+Bank are processed; SBI and Kerala Gramin Bank are listed for testing until
+their parsers exist. The page shows accepted/rejected counts, review issues,
 and normalized JSON. Scans and other layouts may not be supported.
 
 ```sh

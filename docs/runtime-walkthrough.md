@@ -19,7 +19,7 @@ src/workers/statement.worker.js
                       ↓
 src/services/process-statement.js
      ├─ src/extraction/pdf.js → PDF.js → positioned text
-     ├─ src/parsers/union/parser.js → normalized candidates
+     ├─ src/parsers/{union,kotak}/parser.js → normalized candidates
      └─ src/validation/transactions.js → accepted transactions + issues
                       ↓ worker message
 browser/main.js → summary + JSON rendered as plain text
@@ -50,9 +50,11 @@ creates its nested worker from a bundled local asset. An explicit worker port
 avoids PDF.js's default worker setup assuming `window` exists.
 
 `createPdfExtractor(pdfjs)` returns an extractor function.
-`createStatementProcessor({ extractPdf, parser: unionParser })` returns a processor
+`createStatementProcessor({ extractPdf, parser })` returns a processor
 function. These factory calls configure dependencies; they do not process files.
 Processing begins when the registered `self.onmessage` handler receives bytes.
+The worker selects the parser by the bank chosen in the interface and reports
+`unsupported_bank` when no parser exists for that selection.
 
 The handler hashes original bytes before PDF.js can take ownership, invokes the
 service, and posts its normalized result. The nested worker is terminated after

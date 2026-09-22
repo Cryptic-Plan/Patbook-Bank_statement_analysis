@@ -11,7 +11,9 @@ src/
 │   ├── pdf.js
 │   └── lines.js
 ├── parsers/
-│   └── union/
+│   ├── union/
+│   │   └── parser.js
+│   └── kotak/
 │       └── parser.js
 ├── validation/
 │   └── transactions.js
@@ -124,6 +126,7 @@ At startup, it imports:
 import * as pdfjs from "pdfjs-dist";
 import { createPdfExtractor } from "../extraction/pdf.js";
 import { unionParser } from "../parsers/union/parser.js";
+import { kotakParser } from "../parsers/kotak/parser.js";
 import { createStatementProcessor } from "../services/process-statement.js";
 ```
 
@@ -146,12 +149,13 @@ PatBook worker → service, bank parser, validation
 PDF.js worker  → PDF-format processing
 ```
 
-Next, it configures the service:
+Next, it prepares the extractor. The processor is assembled per message because
+the parser is selected by the bank chosen in the interface:
 
 ```js
 const processStatement = createStatementProcessor({
-  extractPdf: createPdfExtractor(pdfjs),
-  parser: unionParser
+  extractPdf,
+  parser // unionParser or kotakParser, by bankId
 });
 ```
 
