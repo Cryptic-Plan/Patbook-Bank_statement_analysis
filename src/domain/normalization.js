@@ -20,10 +20,26 @@ export function isCalendarDate(value) {
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
+// Some banks print dates with month names, e.g. "07 May 2025" or "01-Mar-2025".
+const MONTHS = new Map(Object.entries({
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+}));
+
 export function parseBankDate(value) {
-  const match = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
-  if (!match) throw new Error('Invalid transaction date');
-  const date = `${match[3]}-${match[2]}-${match[1]}`;
-  if (!isCalendarDate(date)) throw new Error('Invalid transaction date');
-  return date;
+  const numeric = /^(\d{2})-(\d{2})-(\d{4})$/.exec(value);
+  if (numeric) {
+    const date = `${numeric[3]}-${numeric[2]}-${numeric[1]}`;
+    if (!isCalendarDate(date)) throw new Error('Invalid transaction date');
+    return date;
+  }
+  const named = /^(\d{1,2})[ -]([A-Za-z]{3,})[ -](\d{4})$/.exec(value.trim());
+  if (named) {
+    const month = MONTHS.get(named[2].slice(0, 3).toLowerCase());
+    if (!month) throw new Error('Invalid transaction date');
+    const date = `${named[3]}-${String(month).padStart(2, '0')}-${named[1].padStart(2, '0')}`;
+    if (!isCalendarDate(date)) throw new Error('Invalid transaction date');
+    return date;
+  }
+  throw new Error('Invalid transaction date');
 }

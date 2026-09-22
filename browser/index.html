@@ -8,13 +8,22 @@
   <body>
     <main>
       <p class="eyebrow">PATBOOK V2 · PARSER FOUNDATION</p>
-      <h1>Process a Union Bank statement</h1>
+      <h1>Process a bank statement</h1>
       <p>Choose one statement to process on your device. Your PDF and password are not uploaded.</p>
-      <p class="note">The initial Union Bank “Details of Statement” format is supported. Other layouts may require review.</p>
+      <p class="note">The Union Bank “Details of Statement” and Kotak Mahindra “Savings Account Transactions” formats are supported. Other layouts may require review.</p>
 
       <!-- This is a small processing harness, not the future transaction UI. -->
       <form id="statement-form">
-        <label for="statement">Union Bank PDF</label>
+        <label for="bank">Bank</label>
+        <select id="bank" name="bank" aria-describedby="bank-help">
+          <option value="union" selected>Union Bank</option>
+          <option value="kotak">Kotak Mahindra Bank</option>
+          <option value="sbi">State Bank of India</option>
+          <option value="kgb">Kerala Gramin Bank</option>
+        </select>
+        <small id="bank-help">Union Bank and Kotak Mahindra Bank statements can be processed right now. Other banks are listed for testing.</small>
+
+        <label for="statement">Statement PDF</label>
         <input id="statement" name="statement" type="file" accept="application/pdf,.pdf" required />
 
         <label for="account">Account label</label>

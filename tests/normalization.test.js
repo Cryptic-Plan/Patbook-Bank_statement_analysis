@@ -23,3 +23,13 @@ test('validates dates as calendar dates, including leap years', () => {
   }
   assert.equal(isCalendarDate('2026-02-30'), false);
 });
+
+test('normalizes month-name dates printed by some banks', () => {
+  assert.equal(parseBankDate('07 May 2025'), '2025-05-07');
+  assert.equal(parseBankDate('01-Mar-2025'), '2025-03-01');
+  assert.equal(parseBankDate('5 Sept 2025'), '2025-09-05');
+  assert.equal(parseBankDate('29 February 2024'), '2024-02-29');
+  for (const text of ['32 May 2026', '31 Apr 2026', '07 Foo 2025', 'May 07 2025']) {
+    assert.throws(() => parseBankDate(text));
+  }
+});

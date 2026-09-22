@@ -2,6 +2,7 @@ import './style.css';
 import { processLocalFile } from '../src/services/browser-processing.js';
 
 const form = document.querySelector('#statement-form');
+const bankSelect = document.querySelector('#bank');
 const fileInput = document.querySelector('#statement');
 const accountInput = document.querySelector('#account');
 const passwordInput = document.querySelector('#password');
@@ -10,6 +11,16 @@ const cancelButton = document.querySelector('#cancel');
 const status = document.querySelector('#status');
 const resultSection = document.querySelector('#result-section');
 let controller;
+
+const banks = {
+  union: 'Union Bank',
+  kotak: 'Kotak Mahindra Bank',
+  sbi: 'State Bank of India',
+  kgb: 'Kerala Gramin Bank',
+};
+// The worker injects parsers for these banks; other banks stay selectable for
+// testing until their parsers exist.
+const supportedBanks = new Set(['union', 'kotak']);
 
 // Event registration happens at module load; processing begins only on submit.
 form.addEventListener('submit', async event => {
@@ -25,7 +36,7 @@ form.addEventListener('submit', async event => {
     // PDF.js nor the bank parser is imported into this interface module.
     const processing = processLocalFile(file, {
       password: passwordInput.value || undefined,
-      account: { id: accountInput.value.trim(), bankId: 'union', currency: 'INR' },
+      account: { id: accountInput.value.trim(), bankId: bankSelect.value, currency: 'INR' },
       signal: controller.signal,
       onProgress: updateProgress,
     });
@@ -49,11 +60,27 @@ fileInput.addEventListener('change', () => {
   status.textContent = 'Statement selected. Ready to process locally.';
 });
 accountInput.addEventListener('input', clearResult);
+bankSelect.addEventListener('change', () => {
+  clearResult();
+  updateBankAvailability();
+});
+
+updateBankAvailability();
+
+function updateBankAvailability() {
+  const supported = supportedBanks.has(bankSelect.value);
+  fileInput.disabled = !supported;
+  processButton.disabled = !supported;
+  status.textContent = supported
+    ? 'Choose a PDF to begin.'
+    : `${banks[bankSelect.value]} parsing is not available yet. Select Union Bank.`;
+}
 
 function setBusy(busy) {
-  [fileInput, accountInput, passwordInput, processButton].forEach(element => { element.disabled = busy; });
+  [bankSelect, fileInput, accountInput, passwordInput, processButton].forEach(element => { element.disabled = busy; });
   cancelButton.disabled = !busy;
   form.setAttribute('aria-busy', String(busy));
+  if (!busy) updateBankAvailability();
 }
 
 function clearResult() {
@@ -65,7 +92,8 @@ function clearResult() {
 }
 
 function updateProgress(progress) {
-  const labels = { parsing: 'Reading Union Bank transaction rows…', validation: 'Validating transactions and balances…' };
+  const bank = banks[bankSelect.value] ?? 'bank';
+  const labels = { parsing: `Reading ${bank} transaction rows…`, validation: 'Validating transactions and balances…' };
   status.textContent = progress.stage === 'extraction'
     ? `Extracted page ${progress.completed} of ${progress.total}…`
     : labels[progress.stage] ?? 'Processing locally…';
